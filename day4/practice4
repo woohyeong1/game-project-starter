@@ -1,0 +1,28 @@
+#include <iostream>
+
+int main() {
+    int score = 0;
+
+    std::cout << "--- 4일차 조건문 실습 ---" << std::endl;
+    std::cout << "시험 점수를 입력하세요 (0~100): ";
+    std::cin >> score;
+
+    // 점수에 따른 조건 분기
+    if (score >= 90) {
+        std::cout << "성적: A 등급입니다! 훌륭해요!" << std::endl;
+    }
+    else if (score >= 80) {
+        std::cout << "성적: B 등급입니다! 잘하셨어요." << std::endl;
+    }
+    else if (score >= 70) {
+        std::cout << "성적: C 등급입니다. 조금 더 분발해봐요!" << std::endl;
+    }
+    else if (score >= 60) {
+        std::cout << "성적: D 등급입니다. 아쉽네요." << std::endl;
+    }
+    else {
+        std::cout << "성적: F 등급입니다. 재수강 대상입니다..." << std::endl;
+    }
+
+    return 100; // 프로그램 종료
+}
