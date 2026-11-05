@@ -1,0 +1,17 @@
+#include <iostream>
+
+int main() {
+    std::cout << "--- 10일차 이중 반복문 실습: 구구단 출력 ---" << std::endl;
+
+    // 바깥쪽 루프: 단을 나타냄 (2단부터 9단까지)
+    for (int i = 2; i <= 9; i++) {
+        std::cout << "\n=== " << i << "단 ===" << std::endl;
+
+        // 안쪽 루프: 곱해지는 수를 나타냄 (1부터 9까지)
+        for (int j = 1; j <= 9; j++) {
+            std::cout << i << " x " << j << " = " << (i * j) << std::endl;
+        }
+    }
+
+    return 0;
+}
