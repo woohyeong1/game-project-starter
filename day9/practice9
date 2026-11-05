@@ -1,0 +1,27 @@
+#include <iostream>
+
+int main() {
+    int input = -1; // 입력받은 숫자를 저장할 변수
+    int sum = 0;    // 입력받은 숫자들의 누적 합
+
+    std::cout << "--- 9일차 while / do-while 실습 ---" << std::endl;
+    std::cout << "숫자를 입력하면 계속 더합니다. (0을 입력하면 종료)" << std::endl;
+
+    // do-while문을 사용하여 최소 한 번은 입력을 받도록 구성
+    do {
+        std::cout << "숫자 입력: ";
+        std::cin >> input;
+
+        sum += input; // 입력한 숫자를 누적해서 더함
+
+        if (input != 0) {
+            std::cout << "현재까지의 누적 합: " << sum << std::endl;
+        }
+
+    } while (input != 0); // input이 0이 아니면 계속 반복, 0이면 반복 종료
+
+    std::cout << "\n[프로그램 종료]" << std::endl;
+    std::cout << "최종 입력된 숫자들의 총합: " << sum << std::endl;
+
+    return 0;
+}
