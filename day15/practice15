@@ -1,0 +1,31 @@
+#include <iostream>
+
+// 1. 두 개의 정수를 매개변수로 받아 더한 결과를 반환하는 함수 정의
+int addNumbers(int a, int b) {
+    int sum = a + b;
+    return sum; // 계산된 결과값을 호출한 곳으로 돌려줍니다.
+}
+
+// 2. 반환값이 없고 출력만 담당하는 함수 (void)
+void printWelcomeMessage() {
+    std::cout << "=== 함수 실습 프로그램에 오신 것을 환영합니다! ===" << std::endl;
+}
+
+int main() {
+    // 환영 인사 함수 호출
+    printWelcomeMessage();
+
+    int num1 = 15;
+    int num2 = 25;
+
+    // 3. addNumbers 함수를 호출하면서 변수 num1, num2를 전달합니다. (인수 전달)
+    int result = addNumbers(num1, num2);
+
+    std::cout << num1 << " + " << num2 << " = " << result << std::endl;
+
+    // 함수는 한 번 만들어두면 필요할 때 여러 번 재사용할 수 있습니다.
+    int result2 = addNumbers(100, 200);
+    std::cout << "100 + 200 = " << result2 << std::endl;
+
+    return 0;
+}
