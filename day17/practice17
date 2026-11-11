@@ -1,0 +1,29 @@
+#include <iostream>
+
+int main() {
+    std::cout << "--- 17일차 포인터와 메모리 주소 실습 ---" << std::endl;
+
+    // 1. 일반 변수 선언
+    int targetNum = 42;
+
+    // 2. 변수의 값과 메모리 주소(&) 확인하기
+    std::cout << "targetNum의 값: " << targetNum << std::endl;
+    std::cout << "targetNum의 메모리 주소(&): " << &targetNum << std::endl; // 16진수 주소 출력
+
+    // 3. 포인터 변수 선언 (targetNum의 주소를 담는 상자)
+    int* ptr = &targetNum;
+
+    std::cout << "\n[포인터 변수 활용]" << std::endl;
+    std::cout << "포인터 ptr이 담고 있는 값(주소): " << ptr << std::endl;
+
+    // 4. 역참조(*)를 이용해 주소를 통해 값 접근하기
+    std::cout << "포인터가 가리키는 곳의 실제 값(*ptr): " << *ptr << std::endl;
+
+    // 5. 포인터를 통해 원본 변수의 값 변경해보기
+    *ptr = 100; // ptr이 가리키는 주소의 값을 100으로 바꿈
+
+    std::cout << "\n[포인터로 값을 변경한 후]" << std::endl;
+    std::cout << "targetNum의 바뀐 값: " << targetNum << std::endl;
+
+    return 0;
+}
