@@ -1,0 +1,47 @@
+#include <iostream>
+
+int main() {
+    std::cout << "--- 19일차 동적 메모리 할당 (new와 delete) 실습 ---" << std::endl;
+
+    // 1. 단일 변수 동적 할당 (Heap 영역 사용)
+    // 힙에 int 크기 만큼의 공간을 빌리고, 초기값으로 50을 넣습니다.
+    int* dynamicNum = new int(50);
+
+    std::cout << "동적 할당된 변수의 값: " << *dynamicNum << std::endl;
+
+    // 값 변경해보기
+    *dynamicNum = 100;
+    std::cout << "바뀐 동적 변수의 값: " << *dynamicNum << std::endl;
+
+    // 사용이 끝난 메모리는 반드시 반납(해제)해야 합니다! (메모리 누수 방지)
+    delete dynamicNum;
+    dynamicNum = nullptr; // 안전을 위해 포인터를 빈 상태(nullptr)로 초기화
+
+    // 2. 동적 배열 할당 (프로그램 실행 중 크기를 결정)
+    int size = 0;
+    std::cout << "\n생성할 배열의 크기를 입력하세요: ";
+    std::cin >> size;
+
+    // 입력받은 크기만큼 힙 영역에 배열 생성
+    int* dynamicArray = new int[size];
+
+    // 값 채워넣기
+    for (int i = 0; i < size; i++) {
+        dynamicArray[i] = (i + 1) * 10;
+    }
+
+    // 출력하기
+    std::cout << "생성된 동적 배열의 요소들: ";
+    for (int i = 0; i < size; i++) {
+        std::cout << dynamicArray[i] << " ";
+    }
+    std::cout << std::endl;
+
+    // 동적 배열을 해제할 때는 반드시 delete 뒤에 대괄호([])를 붙여야 합니다!
+    delete[] dynamicArray;
+    dynamicArray = nullptr;
+
+    std::cout << "\n동적 메모리가 안전하게 해제되었습니다." << std::endl;
+
+    return 0;
+}
