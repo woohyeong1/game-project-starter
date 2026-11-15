@@ -1,0 +1,50 @@
+#include <iostream>
+#include <string>
+
+class Monster {
+private:
+    std::string name;
+    int hp;
+
+public:
+    // 1. 생성자 (Constructor): 객체가 생성될 때 자동 호출
+    Monster(std::string monsterName, int monsterHp) {
+        name = monsterName;
+        hp = monsterHp;
+        std::cout << "👾 [생성됨] " << name << " (HP: " << hp << ") 이(가) 필드에 나타났습니다!" << std::endl;
+    }
+
+    // 2. 소멸자 (Destructor): 객체가 소멸될 때 자동 호출 (~ 기호 사용)
+    ~Monster() {
+        std::cout << "💀 [소멸됨] " << name << "이(가) 처치되어 메모리에서 사라집니다." << std::endl;
+    }
+
+    void takeDamage(int damage) {
+        hp -= damage;
+        std::cout << name << "이(가) " << damage << "의 피해를 입었습니다! (남은 HP: " << hp << ")" << std::endl;
+    }
+};
+
+int main() {
+    std::cout << "--- 21일차 생성자와 소멸자 실습 ---" << std::endl;
+
+    std::cout << "\n[1] 블록(Scope) 내부에서 객체 생성 및 소멸 테스트" << std::endl;
+    {
+        // 이 중괄호(블록) 안에서 태어난 객체는 블록이 끝날 때 자동으로 소멸합니다.
+        Monster goblin("고블린", 50);
+        goblin.takeDamage(20);
+        std::cout << "--- 블록 내부 끝 (고블린이 곧 사라집니다) ---" << std::endl;
+    } // <-- 이 지점에서 고블린의 소멸자가 자동으로 실행됩니다!
+
+    std::cout << "\n[2] 동적 할당과 수동 소멸 테스트" << std::endl;
+    // 힙 영역에 동적 할당된 객체
+    Monster* boss = new Monster("보스 드래곤", 500);
+    boss->takeDamage(100);
+
+    // 동적 할당된 객체는 delete를 해야 비로소 소멸자가 호출됩니다!
+    delete boss; 
+    boss = nullptr;
+
+    std::cout << "\n--- 프로그램 정상 종료 ---" << std::endl;
+    return 0;
+}
