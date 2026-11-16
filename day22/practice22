@@ -1,0 +1,87 @@
+#include <iostream>
+#include <string>
+
+// 1. 부모 클래스 (기본 캐릭터)
+class Character {
+protected: // 상속받은 자식 클래스에서 접근 가능하도록 protected 사용
+    std::string name;
+    int hp;
+
+public:
+    Character(std::string charName, int charHp) {
+        name = charName;
+        hp = charHp;
+    }
+
+    // 공통 기능: 정보 출력
+    void showInfo() {
+        std::cout << "[캐릭터] 이름: " << name << " | HP: " << hp << std::endl;
+    }
+
+    // 가상 함수 (Virtual Function): 자식 클래스에서 오버라이딩(재정의)할 수 있도록 허용
+    virtual void attack() {
+        std::cout << name << "이(가) 기본 공격을 합니다!" << std::endl;
+    }
+};
+
+// 2. 자식 클래스 1: 전사 (Character를 상속받음)
+class Warrior : public Character {
+private:
+    int armor; // 전사만의 특수 능력치
+
+public:
+    Warrior(std::string charName, int charHp, int charArmor) 
+        : Character(charName, charHp) { // 부모 생성자 호출
+        armor = charArmor;
+    }
+
+    // 부모의 attack 함수를 자식 스타일에 맞게 재정의 (Overriding)
+    void attack() override {
+        std::cout << "⚔️ [전사 " << name << "] 검을 휘둘러 강력한 물리 베기 공격!" << std::endl;
+    }
+};
+
+// 3. 자식 클래스 2: 마법사 (Character를 상속받음)
+class Mage : public Character {
+private:
+    int mana; // 마법사만의 특수 능력치
+
+public:
+    Mage(std::string charName, int charHp, int charMana) 
+        : Character(charName, charHp) {
+        mana = charMana;
+    }
+
+    // 마법사만의 attack 재정의
+    void attack() override {
+        std::cout << "🔮 [마법사 " << name << "] 화염구를 발사합니다! (마나: " << mana << ")" << std::endl;
+    }
+};
+
+int main() {
+    std::cout << "--- 22일차 상속과 다형성 실습 ---" << std::endl;
+
+    // 객체 생성
+    Warrior myWarrior("아서스", 150, 50);
+    Mage myMage("제이나", 80, 200);
+
+    std::cout << "\n[개별 객체 정보 및 공격]" << std::endl;
+    myWarrior.showInfo();
+    myWarrior.attack(); // Warrior의 attack 실행
+
+    std::cout << std::endl;
+
+    myMage.showInfo();
+    myMage.attack();    // Mage의 attack 실행
+
+    // 다형성(Polymorphism) 맛보기: 부모 포인터로 자식 객체 다루기
+    std::cout << "\n[다형성 테스트 (부모 포인터 활용)]" << std::endl;
+    Character* pChar1 = &myWarrior;
+    Character* pChar2 = &myMage;
+
+    // 포인터는 Character 타입이지만, 실제 객체가 누구냐에 따라 알맞은 attack()이 실행됩니다!
+    pChar1->attack(); 
+    pChar2->attack(); 
+
+    return 0;
+}
