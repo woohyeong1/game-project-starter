@@ -1,0 +1,54 @@
+#include <iostream>
+#include <string>
+
+// 1. 추상 클래스 (Abstract Class): 직접 객체를 만들 수 없고, 공통 규격만 제공합니다.
+class GameItem {
+public:
+    // 순수 가상 함수: 자식 클래스에서 반드시 재정의(Override)해야 합니다!
+    virtual void use() = 0;
+
+    // 가상 소멸자 (Virtual Destructor): 부모 포인터로 삭제할 때 자식 소멸자까지 안전하게 호출되도록 보장
+    virtual ~GameItem() {
+        std::cout << "[GameItem 소멸] 기본 아이템 메모리가 해제됩니다." << std::endl;
+    }
+};
+
+// 2. 자식 클래스: 체력 포션
+class HealthPotion : public GameItem {
+private:
+    int healAmount;
+
+public:
+    HealthPotion(int amount) {
+        healAmount = amount;
+    }
+
+    // 순수 가상 함수 강제 구현
+    void use() override {
+        std::cout << "🧪 [포션 사용] 체력이 " << healAmount << " 만큼 회복되었습니다! 회복 소리: 뽀로롱~" << std::endl;
+    }
+
+    // 소멸자
+    ~HealthPotion() override {
+        std::cout << "[HealthPotion 소멸] 빈 포션병이 사라집니다." << std::endl;
+    }
+};
+
+int main() {
+    std::cout << "--- 23일차 가상 소멸자와 추상 클래스 실습 ---" << std::endl;
+
+    // GameItem item; // ❌ 에러! 추상 클래스는 직접 객체로 만들 수 없습니다.
+
+    // 부모 포인터로 자식 객체를 동적 할당 (다형성 활용)
+    GameItem* myItem = new HealthPotion(100);
+
+    std::cout << "\n[인벤토리에서 아이템 사용]" << std::endl;
+    myItem->use(); // HealthPotion의 use()가 실행됨
+
+    std::cout << "\n[아이템 버리기 (메모리 해제)]" << std::endl;
+    // 가상 소멸자 덕분에 HealthPotion의 소멸자가 먼저 실행된 후 GameItem의 소멸자가 안전하게 호출됩니다!
+    delete myItem; 
+    myItem = nullptr;
+
+    return 0;
+}
