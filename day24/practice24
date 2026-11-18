@@ -1,0 +1,26 @@
+#include <iostream>
+#include <string>
+
+// 1. 함수 템플릿 정의 (어떤 자료형이든 받아들일 수 있는 만능 금형 틀 'T')
+template <typename T>
+T getMax(T a, T b) {
+    return (a > b) ? a : b; // 더 큰 값을 반환
+}
+
+int main() {
+    std::cout << "--- 24일차 템플릿(Template) 실습 ---" << std::endl;
+
+    // 2. 정수(int)형 비교
+    int maxInt = getMax(10, 20); // 컴파일러가 T를 int로 자동 유추합니다.
+    std::cout << "정수 10과 20 중 더 큰 값: " << maxInt << std::endl;
+
+    // 3. 실수(double)형 비교
+    double maxDouble = getMax(3.14, 5.55); // T가 double로 변환됨
+    std::cout << "실수 3.14와 5.55 중 더 큰 값: " << maxDouble << std::endl;
+
+    // 4. 문자열(string)형 비교 (사전순 비교)
+    std::string maxStr = getMax(std::string("Apple"), std::string("Zebra"));
+    std::cout << "문자열 'Apple'과 'Zebra' 중 더 큰 값: " << maxStr << std::endl;
+
+    return 0;
+}
