@@ -1,0 +1,35 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+int main() {
+    std::cout << "--- 25일차 STL 벡터(std::vector) 실습 ---" << std::endl;
+
+    // 1. 문자열(std::string)을 담는 동적 벡터 생성 (게임 인벤토리 예시)
+    std::vector<std::string> inventory;
+
+    // 2. push_back으로 아이템 추가하기
+    inventory.push_back("낡은 검");
+    inventory.push_back("체력 포션");
+    inventory.push_back("마나 포션");
+
+    std::cout << "\n[아이템 획득 후 인벤토리]" << std::endl;
+    std::cout << "현재 보유 아이템 수: " << inventory.size() << "개" << std::endl;
+
+    // 3. 반복문을 통한 요소 출력 (배열처럼 [] 인덱스 사용 가능)
+    for (size_t i = 0; i < inventory.size(); i++) {
+        std::cout << (i + 1) << ". " << inventory[i] << std::endl;
+    }
+
+    // 4. 맨 뒤 아이템 제거 (pop_back)
+    std::cout << "\n[마지막 아이템 버리기]" << std::endl;
+    inventory.pop_back(); // "마나 포션" 제거
+
+    std::cout << "남은 아이템 수: " << inventory.size() << "개" << std::endl;
+    for (const auto& item : inventory) { // 범위 기반 for문으로 깔끔하게 출력
+        std::cout << "- " << item << std::endl;
+    }
+
+    // 별도의 delete[] 없이 main 함수가 끝나면 벡터가 스스로 메모리를 정리합니다!
+    return 0;
+}
