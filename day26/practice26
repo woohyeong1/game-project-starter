@@ -1,0 +1,33 @@
+#include <iostream>
+#include <map>
+#include <string>
+
+int main() {
+    std::cout << "--- 26일차 STL 맵(std::map) 실습 ---" << std::endl;
+
+    // 1. 아이템 이름(Key) -> 보유 개수(Value)를 저장하는 map 생성
+    std::map<std::string, int> itemCounts;
+
+    // 2. 키-값 쌍 추가 및 수정
+    itemCounts["체력 포션"] = 5;
+    itemCounts["마나 포션"] = 3;
+    itemCounts.insert({ "엘릭서", 1 });
+
+    // 기존 키에 값을 대입하면 개수가 갱신됩니다.
+    itemCounts["체력 포션"] += 2; // 5 + 2 = 7개
+
+    // 3. 특정 키 조회하기 (find 활용)
+    std::string target = "마나 포션";
+    auto it = itemCounts.find(target);
+    if (it != itemCounts.end()) {
+        std::cout << "\n[조회 성공] " << it->first << " 보유 개수: " << it->second << "개" << std::endl;
+    }
+
+    // 4. 전체 목록 출력 (Key 기준 자동 정렬되어 출력됨)
+    std::cout << "\n[전체 보유 아이템 목록 (Key 오름차순)]" << std::endl;
+    for (const auto& pair : itemCounts) {
+        std::cout << "- " << pair.first << ": " << pair.second << "개" << std::endl;
+    }
+
+    return 0;
+}
