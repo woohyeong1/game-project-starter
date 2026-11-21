@@ -1,0 +1,46 @@
+#include <iostream>
+#include <vector>
+#include <algorithm> // std::sort, std::find
+
+int main() {
+    std::cout << "--- 27일차 STL 알고리즘과 람다 실습 ---" << std::endl;
+
+    std::vector<int> scores = { 420, 150, 890, 310, 670 };
+
+    // 1. 기본 오름차순 정렬 (std::sort)
+    std::sort(scores.begin(), scores.end());
+    std::cout << "\n[1] 오름차순 정렬 결과: ";
+    for (int s : scores) {
+        std::cout << s << " ";
+    }
+    std::cout << std::endl;
+
+    // 2. 람다(Lambda)를 이용한 내림차순 정렬 (높은 점수부터 정렬)
+    // [](int a, int b) { return a > b; } -> a가 b보다 크면 앞에 배치
+    std::sort(scores.begin(), scores.end(), [](int a, int b) {
+        return a > b;
+    });
+    std::cout << "[2] 람다 내림차순 정렬 결과: ";
+    for (int s : scores) {
+        std::cout << s << " ";
+    }
+    std::cout << std::endl;
+
+    // 3. 특정 값 탐색 (std::find)
+    int targetScore = 670;
+    auto it = std::find(scores.begin(), scores.end(), targetScore);
+    if (it != scores.end()) {
+        std::cout << "\n[3] 탐색 성공! 점수 " << *it << "점을 찾았습니다." << std::endl;
+    }
+    else {
+        std::cout << "\n[3] 점수 " << targetScore << "점을 찾지 못했습니다." << std::endl;
+    }
+
+    // 4. 람다와 std::count_if로 특정 조건 만족 개수 세기 (500점 이상 기록 수)
+    int highScoreCount = std::count_if(scores.begin(), scores.end(), [](int s) {
+        return s >= 500;
+    });
+    std::cout << "[4] 500점 이상 기록 개수: " << highScoreCount << "개" << std::endl;
+
+    return 0;
+}
