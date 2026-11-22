@@ -1,0 +1,61 @@
+#include <iostream>
+#include <memory> // std::unique_ptr, std::shared_ptr, std::make_unique, std::make_shared
+#include <string>
+
+class Weapon {
+private:
+    std::string name;
+    int attackPower;
+
+public:
+    Weapon(std::string weaponName, int power)
+        : name(weaponName), attackPower(power) {
+        std::cout << "⚔️ [생성] 무기 '" << name << "' (공격력: " << attackPower << ") 생성됨" << std::endl;
+    }
+
+    ~Weapon() {
+        std::cout << "🗑️ [소멸] 무기 '" << name << "' 메모리 자동 해제됨" << std::endl;
+    }
+
+    void use() const {
+        std::cout << "  -> '" << name << "' 휘두르기! (공격력: " << attackPower << ")" << std::endl;
+    }
+};
+
+int main() {
+    std::cout << "--- 28일차 스마트 포인터 실습 ---" << std::endl;
+
+    // 1. std::unique_ptr: 단독 소유 포인터
+    std::cout << "\n[1] std::unique_ptr 테스트" << std::endl;
+    {
+        std::unique_ptr<Weapon> sword = std::make_unique<Weapon>("강철 대검", 45);
+        sword->use();
+
+        // 소유권 이전 (std::move): 이제 sword는 비워지고 movedSword가 소유합니다.
+        std::unique_ptr<Weapon> movedSword = std::move(sword);
+        if (!sword) {
+            std::cout << "  -> 기존 unique_ptr(sword)의 소유권이 movedSword로 이전되었습니다." << std::endl;
+        }
+        if (movedSword) {
+            movedSword->use();
+        }
+    } // 블록 끝: movedSword가 스코프를 벗어나며 delete 없이 자동으로 소멸!
+
+    // 2. std::shared_ptr: 공유 소유 포인터
+    std::cout << "\n[2] std::shared_ptr 테스트" << std::endl;
+    std::shared_ptr<Weapon> sharedBow = std::make_shared<Weapon>("엘프의 활", 35);
+    std::cout << "  -> 현재 참조 카운트: " << sharedBow.use_count() << std::endl;
+
+    {
+        // 같은 객체를 공유하는 포인터 추가 생성
+        std::shared_ptr<Weapon> coOwnerBow = sharedBow;
+        std::cout << "  -> 블록 내부 참조 카운트: " << sharedBow.use_count() << std::endl;
+        coOwnerBow->use();
+    } // coOwnerBow 소멸하지만, sharedBow가 여전히 살아있으므로 무기는 아직 소멸하지 않습니다!
+
+    std::cout << "  -> 블록 탈출 후 참조 카운트: " << sharedBow.use_count() << std::endl;
+    sharedBow->use();
+
+    std::cout << "\n--- main 종료 직전 (이 시점에 sharedBow가 소멸하며 무기 해제) ---" << std::endl;
+    return 0;
+}
