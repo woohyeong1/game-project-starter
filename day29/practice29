@@ -1,0 +1,58 @@
+#include <iostream>
+#include <fstream> // std::ofstream, std::ifstream
+#include <string>
+
+int main() {
+    std::cout << "--- 29일차 파일 입출력 (<fstream>) 실습 ---" << std::endl;
+
+    const std::string fileName = "save_data.txt";
+
+    // 1. 파일 쓰기 (std::ofstream): 게임 세이브 데이터 기록 예시
+    std::ofstream outFile(fileName);
+    if (!outFile.is_open()) {
+        std::cerr << "[오류] 저장할 파일을 열 수 없습니다!" << std::endl;
+        return 1;
+    }
+
+    outFile << "PlayerName: Hero" << std::endl;
+    outFile << "Level: 12" << std::endl;
+    outFile << "Gold: 1540" << std::endl;
+    outFile.close(); // 파일 스트림 닫기 (자원 정리)
+
+    std::cout << "\n[1] '" << fileName << "' 파일에 데이터를 저장했습니다." << std::endl;
+
+    // 2. 파일 읽기 (std::ifstream): 저장된 데이터 불러오기
+    std::ifstream inFile(fileName);
+    if (!inFile.is_open()) {
+        std::cerr << "[오류] 읽을 파일을 열 수 없습니다!" << std::endl;
+        return 1;
+    }
+
+    std::cout << "\n[2] '" << fileName << "' 파일에서 읽어온 내용:" << std::endl;
+    std::string line;
+    while (std::getline(inFile, line)) {
+        std::cout << "  -> " << line << std::endl;
+    }
+    inFile.close();
+
+    // 3. 기존 파일 끝에 내용 추가하기 (std::ios::app 모드)
+    std::ofstream appendFile(fileName, std::ios::app);
+    if (appendFile.is_open()) {
+        appendFile << "LastStage: Forest_Boss" << std::endl;
+        appendFile.close();
+        std::cout << "\n[3] 기존 파일 끝에 추가 데이터를 기록했습니다." << std::endl;
+    }
+
+    // 추가 후 다시 전체 읽기
+    std::ifstream reReadFile(fileName);
+    if (reReadFile.is_open()) {
+        std::cout << "\n[4] 최종 파일 내용 확인:" << std::endl;
+        std::string updatedLine;
+        while (std::getline(reReadFile, updatedLine)) {
+            std::cout << "  -> " << updatedLine << std::endl;
+        }
+        reReadFile.close();
+    }
+
+    return 0;
+}
