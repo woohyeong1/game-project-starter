@@ -1,0 +1,136 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <map>
+#include <vector>
+
+class Player {
+private:
+    std::string name;
+    int level;
+    int gold;
+    std::map<std::string, int> inventory; // 아이템 이름 -> 개수
+    std::vector<std::string> logs;       // 행동 로그
+
+public:
+    Player(std::string playerName = "모험가", int lv = 1, int startGold = 100)
+        : name(playerName), level(lv), gold(startGold) {
+    }
+
+    void addItem(const std::string& itemName, int count = 1) {
+        inventory[itemName] += count;
+        logs.push_back("아이템 획득: " + itemName + " x" + std::to_string(count));
+    }
+
+    void earnGold(int amount) {
+        gold += amount;
+        logs.push_back("골드 획득: +" + std::to_string(amount) + "G");
+    }
+
+    void levelUp() {
+        level++;
+        logs.push_back("레벨 업! 현재 Lv." + std::to_string(level));
+    }
+
+    void showStatus() const {
+        std::cout << "\n========== [플레이어 상태] ==========" << std::endl;
+        std::cout << "이름: " << name << " | 레벨: Lv." << level << " | 골드: " << gold << "G" << std::endl;
+        std::cout << "--- 인벤토리 ---" << std::endl;
+        if (inventory.empty()) {
+            std::cout << "  (비어 있음)" << std::endl;
+        }
+        else {
+            for (const auto& pair : inventory) {
+                std::cout << "  - " << pair.first << ": " << pair.second << "개" << std::endl;
+            }
+        }
+        std::cout << "--- 최근 로그 ---" << std::endl;
+        for (const auto& entry : logs) {
+            std::cout << "  * " << entry << std::endl;
+        }
+        std::cout << "====================================" << std::endl;
+    }
+
+    bool saveToFile(const std::string& filename) const {
+        std::ofstream out(filename);
+        if (!out.is_open()) {
+            return false;
+        }
+
+        // 기본 스탯 저장
+        out << "PLAYER " << name << " " << level << " " << gold << "\n";
+        // 인벤토리 항목 수 및 목록 저장 (공백 없는 아이템 이름 기준 파싱 예시)
+        out << "ITEMS " << inventory.size() << "\n";
+        for (const auto& pair : inventory) {
+            out << pair.first << " " << pair.second << "\n";
+        }
+
+        out.close();
+        return true;
+    }
+
+    bool loadFromFile(const std::string& filename) {
+        std::ifstream in(filename);
+        if (!in.is_open()) {
+            return false;
+        }
+
+        std::string header;
+        if (!(in >> header) || header != "PLAYER") {
+            return false;
+        }
+
+        in >> name >> level >> gold;
+
+        std::string itemHeader;
+        size_t itemCount = 0;
+        if ((in >> itemHeader >> itemCount) && itemHeader == "ITEMS") {
+            inventory.clear();
+            for (size_t i = 0; i < itemCount; i++) {
+                std::string itemName;
+                int count = 0;
+                if (in >> itemName >> count) {
+                    inventory[itemName] = count;
+                }
+            }
+        }
+
+        logs.clear();
+        logs.push_back("세이브 파일 '" + filename + "' 불러오기 완료");
+        in.close();
+        return true;
+    }
+};
+
+int main() {
+    std::cout << "--- 30일차 미니 프로젝트: 세이브/로드 & 인벤토리 매니저 ---" << std::endl;
+
+    const std::string saveFile = "rpg_save.txt";
+    Player hero("리온", 1, 150);
+
+    // 세이브 파일이 이미 있으면 불러오기 테스트
+    std::ifstream checkFile(saveFile);
+    if (checkFile.good()) {
+        checkFile.close();
+        std::cout << "\n기존 세이브 파일(" << saveFile << ")을 발견했습니다. 불러오기를 시도합니다..." << std::endl;
+        if (hero.loadFromFile(saveFile)) {
+            hero.showStatus();
+        }
+    }
+    else {
+        std::cout << "\n새 모험을 시작합니다!" << std::endl;
+        hero.addItem("체력포션", 3);
+        hero.addItem("강철검", 1);
+        hero.earnGold(250);
+        hero.levelUp();
+        hero.showStatus();
+
+        if (hero.saveToFile(saveFile)) {
+            std::cout << "\n[저장 완료] '" << saveFile << "' 파일에 진행 상황이 저장되었습니다." << std::endl;
+            std::cout << "프로그램을 한 번 더 실행(Ctrl + F5)하면 저장된 데이터가 불러와집니다!" << std::endl;
+        }
+    }
+
+    return 0;
+}
