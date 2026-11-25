@@ -1,0 +1,18 @@
+#pragma once
+
+#include "Player.h"
+#include <string>
+#include <map>
+
+class Shop {
+private:
+    std::map<std::string, int> buyPrices;  // 상점에서 살 때 가격
+    std::map<std::string, int> sellPrices; // 상점에 팔 때 가격
+
+public:
+    Shop();
+
+    void showCatalog() const;
+    bool buyItem(Player& player, const std::string& itemName, int count = 1);
+    bool sellItem(Player& player, const std::string& itemName, int count = 1);
+};
