@@ -1,0 +1,40 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include "Player.h"
+#include "Shop.h"
+
+int main() {
+    std::cout << "--- 확장 미니 프로젝트: 헤더/소스 분리 & 상점 시스템 ---" << std::endl;
+
+    const std::string saveFile = "rpg_save.txt";
+    Player hero("리온", 1, 250);
+    Shop villageShop;
+
+    std::ifstream checkFile(saveFile);
+    if (checkFile.good()) {
+        checkFile.close();
+        if (hero.loadFromFile(saveFile)) {
+            std::cout << "\n기존 세이브 데이터를 불러왔습니다." << std::endl;
+        }
+    }
+    else {
+        std::cout << "\n새 캐릭터로 시작합니다." << std::endl;
+        hero.addItem("슬라임젤리", 3);
+    }
+
+    villageShop.showCatalog();
+
+    // 구매 및 판매 시나리오 테스트
+    villageShop.buyItem(hero, "체력포션", 2);
+    villageShop.sellItem(hero, "슬라임젤리", 2);
+    villageShop.buyItem(hero, "강철검", 1);
+
+    hero.showStatus();
+
+    if (hero.saveToFile(saveFile)) {
+        std::cout << "\n변경된 골드와 인벤토리가 '" << saveFile << "'에 저장되었습니다." << std::endl;
+    }
+
+    return 0;
+}
