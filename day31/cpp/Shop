@@ -1,0 +1,73 @@
+#include "Shop.h"
+#include <iostream>
+
+Shop::Shop() {
+    buyPrices["체력포션"] = 50;
+    buyPrices["마나포션"] = 60;
+    buyPrices["강철검"] = 180;
+
+    sellPrices["체력포션"] = 25;
+    sellPrices["마나포션"] = 30;
+    sellPrices["강철검"] = 90;
+    sellPrices["슬라임젤리"] = 20; // 드롭 아이템 판매용
+}
+
+void Shop::showCatalog() const {
+    std::cout << "\n========== [마을 상점 가격표] ==========" << std::endl;
+    for (const auto& pair : buyPrices) {
+        int sellPrice = 0;
+        auto sellIt = sellPrices.find(pair.first);
+        if (sellIt != sellPrices.end()) {
+            sellPrice = sellIt->second;
+        }
+        std::cout << "  - " << pair.first << " | 구매: " << pair.second << "G | 판매: " << sellPrice << "G" << std::endl;
+    }
+    std::cout << "  - 슬라임젤리 | 구매: 불가 | 판매: 20G" << std::endl;
+    std::cout << "========================================" << std::endl;
+}
+
+bool Shop::buyItem(Player& player, const std::string& itemName, int count) {
+    if (count <= 0) {
+        std::cout << "[상점] 수량은 1개 이상이어야 합니다." << std::endl;
+        return false;
+    }
+
+    auto it = buyPrices.find(itemName);
+    if (it == buyPrices.end()) {
+        std::cout << "[상점] '" << itemName << "'은(는) 판매하지 않는 상품입니다." << std::endl;
+        return false;
+    }
+
+    int totalCost = it->second * count;
+    if (!player.spendGold(totalCost)) {
+        std::cout << "[상점] 골드가 부족합니다! (필요: " << totalCost << "G, 보유: " << player.getGold() << "G)" << std::endl;
+        return false;
+    }
+
+    player.addItem(itemName, count);
+    std::cout << "[구매 완료] " << itemName << " x" << count << " 구매 (-" << totalCost << "G)" << std::endl;
+    return true;
+}
+
+bool Shop::sellItem(Player& player, const std::string& itemName, int count) {
+    if (count <= 0) {
+        std::cout << "[상점] 수량은 1개 이상이어야 합니다." << std::endl;
+        return false;
+    }
+
+    auto sellIt = sellPrices.find(itemName);
+    if (sellIt == sellPrices.end()) {
+        std::cout << "[상점] '" << itemName << "'은(는) 매입하지 않는 아이템입니다." << std::endl;
+        return false;
+    }
+
+    if (!player.removeItem(itemName, count)) {
+        std::cout << "[상점] 해당 아이템이 부족합니다! (현재 보유: " << player.getItemCount(itemName) << "개)" << std::endl;
+        return false;
+    }
+
+    int totalEarned = sellIt->second * count;
+    player.earnGold(totalEarned);
+    std::cout << "[판매 완료] " << itemName << " x" << count << " 판매 (+" << totalEarned << "G)" << std::endl;
+    return true;
+}
