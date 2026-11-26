@@ -1,12 +1,153 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <limits>
 #include "Player.h"
 #include "Shop.h"
 
-int main() {
-    std::cout << "--- 확장 미니 프로젝트: 헤더/소스 분리 & 상점 시스템 ---" << std::endl;
+namespace {
 
+enum class GameState {
+    Title,
+    Town,
+    Shop,
+    Battle,
+    Exit
+};
+
+int readIntInRange(const std::string& prompt, int minVal, int maxVal) {
+    while (true) {
+        std::cout << prompt;
+        int value = 0;
+        if (std::cin >> value && value >= minVal && value <= maxVal) {
+            return value;
+        }
+
+        std::cout << "[입력 오류] " << minVal << "부터 " << maxVal << " 사이의 숫자를 입력해 주세요." << std::endl;
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+}
+
+std::string readToken(const std::string& prompt) {
+    std::cout << prompt;
+    std::string token;
+    std::cin >> token;
+    return token;
+}
+
+void renderTitle() {
+    std::cout << "\n===============================" << std::endl;
+    std::cout << "      CONSOLE RPG - FSM DEMO   " << std::endl;
+    std::cout << "===============================" << std::endl;
+    std::cout << "1. 게임 시작 (마을로 이동)" << std::endl;
+    std::cout << "2. 종료" << std::endl;
+}
+
+void updateTitle(GameState& state) {
+    int choice = readIntInRange("선택: ", 1, 2);
+    if (choice == 1) {
+        state = GameState::Town;
+    }
+    else {
+        state = GameState::Exit;
+    }
+}
+
+void renderTown(const Player& hero) {
+    std::cout << "\n--- [마을 광장] (" << hero.getName() << " | 보유 골드: " << hero.getGold() << "G) ---" << std::endl;
+    std::cout << "1. 상점 방문" << std::endl;
+    std::cout << "2. 슬라임 사냥터 이동 (전투)" << std::endl;
+    std::cout << "3. 상태 및 인벤토리 확인" << std::endl;
+    std::cout << "4. 저장 후 타이틀로" << std::endl;
+}
+
+void updateTown(GameState& state, Player& hero, const std::string& saveFile) {
+    int choice = readIntInRange("선택: ", 1, 4);
+    switch (choice) {
+    case 1:
+        state = GameState::Shop;
+        break;
+    case 2:
+        state = GameState::Battle;
+        break;
+    case 3:
+        hero.showStatus();
+        break;
+    case 4:
+        if (hero.saveToFile(saveFile)) {
+            std::cout << "[저장 완료] '" << saveFile << "'에 저장되었습니다." << std::endl;
+        }
+        state = GameState::Title;
+        break;
+    }
+}
+
+void renderShop() {
+    std::cout << "\n--- [마을 상점] ---" << std::endl;
+    std::cout << "1. 가격표 보기" << std::endl;
+    std::cout << "2. 아이템 구매" << std::endl;
+    std::cout << "3. 아이템 판매" << std::endl;
+    std::cout << "4. 마을로 돌아가기" << std::endl;
+}
+
+void updateShop(GameState& state, Player& hero, Shop& shop) {
+    int choice = readIntInRange("선택: ", 1, 4);
+    switch (choice) {
+    case 1:
+        shop.showCatalog();
+        break;
+    case 2: {
+        shop.showCatalog();
+        std::string item = readToken("구매할 아이템 이름: ");
+        int count = readIntInRange("수량 (1~99): ", 1, 99);
+        shop.buyItem(hero, item, count);
+        break;
+    }
+    case 3: {
+        hero.showStatus();
+        std::string item = readToken("판매할 아이템 이름: ");
+        int count = readIntInRange("수량 (1~99): ", 1, 99);
+        shop.sellItem(hero, item, count);
+        break;
+    }
+    case 4:
+        state = GameState::Town;
+        break;
+    }
+}
+
+void renderBattle(int slimeHp) {
+    std::cout << "\n--- [전투 상태: 야생 슬라임 | 슬라임 HP: " << slimeHp << "] ---" << std::endl;
+    std::cout << "1. 공격하기" << std::endl;
+    std::cout << "2. 마을로 도망가기" << std::endl;
+}
+
+void updateBattle(GameState& state, Player& hero, int& slimeHp) {
+    int choice = readIntInRange("선택: ", 1, 2);
+    if (choice == 1) {
+        int damage = 25 + hero.getItemCount("강철검") * 20;
+        slimeHp -= damage;
+        std::cout << "공격! 슬라임에게 " << damage << " 피해를 입혔습니다." << std::endl;
+
+        if (slimeHp <= 0) {
+            std::cout << "승리! 골드 +60G, '슬라임젤리' x1 획득!" << std::endl;
+            hero.earnGold(60);
+            hero.addItem("슬라임젤리", 1);
+            slimeHp = 50; // 다음 전투를 위해 체력 초기화
+            state = GameState::Town;
+        }
+    }
+    else {
+        std::cout << "안전하게 마을로 돌아왔습니다." << std::endl;
+        slimeHp = 50;
+        state = GameState::Town;
+    }
+}
+
+} // namespace
+
+int main() {
     const std::string saveFile = "rpg_save.txt";
     Player hero("리온", 1, 250);
     Shop villageShop;
@@ -14,27 +155,40 @@ int main() {
     std::ifstream checkFile(saveFile);
     if (checkFile.good()) {
         checkFile.close();
-        if (hero.loadFromFile(saveFile)) {
-            std::cout << "\n기존 세이브 데이터를 불러왔습니다." << std::endl;
+        hero.loadFromFile(saveFile);
+    }
+
+    GameState currentState = GameState::Title;
+    int slimeHp = 50;
+
+    // 메인 게임 루프
+    while (currentState != GameState::Exit) {
+        switch (currentState) {
+        case GameState::Title:
+            renderTitle();
+            updateTitle(currentState);
+            break;
+
+        case GameState::Town:
+            renderTown(hero);
+            updateTown(currentState, hero, saveFile);
+            break;
+
+        case GameState::Shop:
+            renderShop();
+            updateShop(currentState, hero, villageShop);
+            break;
+
+        case GameState::Battle:
+            renderBattle(slimeHp);
+            updateBattle(currentState, hero, slimeHp);
+            break;
+
+        case GameState::Exit:
+            break;
         }
     }
-    else {
-        std::cout << "\n새 캐릭터로 시작합니다." << std::endl;
-        hero.addItem("슬라임젤리", 3);
-    }
 
-    villageShop.showCatalog();
-
-    // 구매 및 판매 시나리오 테스트
-    villageShop.buyItem(hero, "체력포션", 2);
-    villageShop.sellItem(hero, "슬라임젤리", 2);
-    villageShop.buyItem(hero, "강철검", 1);
-
-    hero.showStatus();
-
-    if (hero.saveToFile(saveFile)) {
-        std::cout << "\n변경된 골드와 인벤토리가 '" << saveFile << "'에 저장되었습니다." << std::endl;
-    }
-
+    std::cout << "\n게임 루프를 종료합니다." << std::endl;
     return 0;
 }
